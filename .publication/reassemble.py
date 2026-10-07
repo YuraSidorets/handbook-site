@@ -25,7 +25,7 @@ def reassemble(root, output):
     root = root.resolve()
     output = output.resolve()
     manifest = json.loads((root / '.publication/package.json').read_text())
-    if manifest['schema'] != 1 or manifest['site_url'] != 'https://handbook.sydorets.com/':
+    if manifest['schema'] != 2 or manifest['site_url'] != 'https://handbook.sydorets.com/':
         raise ValueError('Unexpected package schema or site URL')
     if output == root or root in output.parents:
         raise ValueError('Extract outside the repository checkout')
@@ -71,13 +71,31 @@ def reassemble(root, output):
             checked[name] = data
     if set(checked) != set(allowed) or 'CNAME' in checked:
         raise ValueError('Incomplete allowlist or packaged CNAME')
+    # One explicit, integrity-checked renderer fix overlays the verified base.
+    overrides = manifest.get('overrides', [])
+    if len(overrides) != 1:
+        raise ValueError('Exactly one renderer override is required')
+    override = overrides[0]
+    target = 'assets/diagrams.mjs'
+    source = '.publication/overrides/' + target
+    if override['target'] != target or override['path'] != source:
+        raise ValueError('Unexpected override target or path')
+    if override['base_sha256'] != digest(checked[target]):
+        raise ValueError('Override base checksum mismatch')
+    override_path = root / source
+    if override_path.is_symlink() or not override_path.resolve().is_relative_to(root):
+        raise ValueError('Unsafe override file')
+    data = override_path.read_bytes()
+    if len(data) != override['size'] or digest(data) != override['sha256']:
+        raise ValueError('Override checksum or length mismatch')
+    checked[target] = data
     output.mkdir(parents=True, exist_ok=True)
     for name, data in checked.items():
         path = output / name
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(data)
     (output / 'CNAME').write_bytes(cname)
-    print(f'Verified {len(checked)} static files and preserved the user-managed CNAME.')
+    print(f'Verified {len(checked)} base files, applied one checked renderer override, and preserved the user-managed CNAME.')
 
 
 if __name__ == '__main__':
