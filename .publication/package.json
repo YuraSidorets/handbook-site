@@ -1044,8 +1044,8 @@
     {
       "path": ".publication/overrides/assets/diagrams.mjs",
       "target": "assets/diagrams.mjs",
-      "size": 795,
-      "sha256": "bbc336d0c8b6fac3fe339511a93ad3bdd1102a1bfbe9dd47c29922fe01610156",
+      "size": 3803,
+      "sha256": "66ce7955b371e475e37e3d0ca3b6c1a6be3c0284652154ff17df459556133936",
       "base_sha256": "9ce0dc06a242f76efec025b30fbf850a62de18f8e61b27f0cc0187f1fcaebb02"
     }
   ]
