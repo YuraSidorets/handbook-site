@@ -71,31 +71,36 @@ def reassemble(root, output):
             checked[name] = data
     if set(checked) != set(allowed) or 'CNAME' in checked:
         raise ValueError('Incomplete allowlist or packaged CNAME')
-    # One explicit, integrity-checked renderer fix overlays the verified base.
+    # Explicit integrity-checked reader corrections overlay the verified base.
     overrides = manifest.get('overrides', [])
-    if len(overrides) != 1:
-        raise ValueError('Exactly one renderer override is required')
-    override = overrides[0]
-    target = 'assets/diagrams.mjs'
-    source = '.publication/overrides/' + target
-    if override['target'] != target or override['path'] != source:
-        raise ValueError('Unexpected override target or path')
-    if override['base_sha256'] != digest(checked[target]):
-        raise ValueError('Override base checksum mismatch')
-    override_path = root / source
-    if override_path.is_symlink() or not override_path.resolve().is_relative_to(root):
-        raise ValueError('Unsafe override file')
-    data = override_path.read_bytes()
-    if len(data) != override['size'] or digest(data) != override['sha256']:
-        raise ValueError('Override checksum or length mismatch')
-    checked[target] = data
+    expected_targets = {
+        'assets/diagrams.mjs',
+        'observability/index.html',
+        'observability/System-Layers/1-Frontend-and-User-Experience/index.html',
+    }
+    if len(overrides) != len(expected_targets) or {row['target'] for row in overrides} != expected_targets:
+        raise ValueError('Unexpected override target set')
+    for override in overrides:
+        target = override['target']
+        source = '.publication/overrides/' + target
+        if override['path'] != source:
+            raise ValueError('Unexpected override path')
+        if override['base_sha256'] != digest(checked[target]):
+            raise ValueError('Override base checksum mismatch')
+        override_path = root / source
+        if override_path.is_symlink() or not override_path.resolve().is_relative_to(root):
+            raise ValueError('Unsafe override file')
+        data = override_path.read_bytes()
+        if len(data) != override['size'] or digest(data) != override['sha256']:
+            raise ValueError('Override checksum or length mismatch')
+        checked[target] = data
     output.mkdir(parents=True, exist_ok=True)
     for name, data in checked.items():
         path = output / name
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(data)
     (output / 'CNAME').write_bytes(cname)
-    print(f'Verified {len(checked)} base files, applied one checked renderer override, and preserved the user-managed CNAME.')
+    print(f'Verified {len(checked)} base files, applied three checked reader overrides, and preserved the user-managed CNAME.')
 
 
 if __name__ == '__main__':

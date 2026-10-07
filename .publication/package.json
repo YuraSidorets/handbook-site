@@ -1047,6 +1047,20 @@
       "size": 3803,
       "sha256": "66ce7955b371e475e37e3d0ca3b6c1a6be3c0284652154ff17df459556133936",
       "base_sha256": "9ce0dc06a242f76efec025b30fbf850a62de18f8e61b27f0cc0187f1fcaebb02"
+    },
+    {
+      "path": ".publication/overrides/observability/index.html",
+      "target": "observability/index.html",
+      "size": 71770,
+      "sha256": "302a959bec2e7ff69d6f86c228930881bea27d5d0dccf996ee5e084c2a407450",
+      "base_sha256": "83f4b87873f8891c7c406758f5b52122eaa29ce1472191e70e2653ab7fe85d11"
+    },
+    {
+      "path": ".publication/overrides/observability/System-Layers/1-Frontend-and-User-Experience/index.html",
+      "target": "observability/System-Layers/1-Frontend-and-User-Experience/index.html",
+      "size": 73751,
+      "sha256": "111379d7f3d662eb247c1d43e48d91e381ca3bc0844450723b7bdd65f4fb6621",
+      "base_sha256": "f1a00c4b81fd6f0943a1e016586657369fc4d01c7c4a99ec4c75502277485deb"
     }
   ]
 }
